@@ -1,5 +1,26 @@
 if mp.get_property_bool('osc', true) then return end
 
+-- BEGIN: by 9beach@gmail.com
+math.randomseed(os.time())
+
+local quote_id = 1
+local quotes = {'Drop (or paste) media files or URLs to play here.'}
+local quotes_path
+
+quotes_path = (os.getenv('APPDATA') or os.getenv('HOME')..'/.config')..
+              '/mpv/script-opts/osc-quotes.txt'
+
+local quotes_f = io.open(quotes_path, "r")
+if quotes_f then
+    quotes_f:close()
+    quotes = {}
+    for line in io.lines(quotes_path) do
+        quotes[#quotes + 1] = line
+    end
+end
+
+-- END: by 9beach@gmail.com
+
 local assdraw = require "mp.assdraw"
 local msg = require "mp.msg"
 local opt = require "mp.options"
@@ -158,8 +179,8 @@ local function render_idle()
     ass:new_event()
     ass:pos(display_w / 2, icon_y + 65)
     ass:an(8)
-    ass:append("Drop files or URLs to play here.")
-
+    quote_id = math.random(1, #quotes)
+    ass:append(quotes[quote_id])
     set_osd(display_w, display_h, ass.text)
 end
 
